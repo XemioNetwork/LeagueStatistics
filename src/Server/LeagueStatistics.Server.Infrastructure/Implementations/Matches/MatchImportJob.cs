@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Castle.Core.Logging;
 using CuttingEdge.Conditions;
 using LeagueStatistics.Server.Abstractions.Services;
 using LeagueStatistics.Server.Infrastructure.Extensions;
@@ -20,6 +21,13 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Matches
         private readonly ILeagueService _leagueService;
         #endregion
 
+        #region Properties
+        /// <summary>
+        /// Gets or sets the logger.
+        /// </summary>
+        public ILogger Logger { get; set; }
+        #endregion
+
         #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="MatchImportJob"/> class.
@@ -32,6 +40,8 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Matches
                 .IsNotNull();
             Condition.Requires(leagueService, "leagueService")
                 .IsNotNull();
+
+            this.Logger = NullLogger.Instance;
 
             this._documentStore = documentStore;
             this._leagueService = leagueService;
@@ -46,28 +56,40 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Matches
         /// <param name="context">The execution context.</param>
         public void Execute(IJobExecutionContext context)
         {
-            using (IDocumentSession documentSession = this._documentStore.OpenSession())
+            try
             {
-                IEnumerable<Summoner> summoners = this.GetSummonersToLoadMatchesFrom(documentSession);
-
-                foreach (var summoner in summoners)
+                using (IDocumentSession documentSession = this._documentStore.OpenSession())
                 {
-                    IEnumerable<Match> matches = this._leagueService.GetRecentMatchesAsync(summoner.Id.GetIntId()).Result;
-                    foreach (var match in matches)
+                    IEnumerable<Summoner> summoners = this.GetSummonersToLoadMatchesFrom(documentSession);
+
+                    foreach (var summoner in summoners)
                     {
-                        documentSession.Store(match);
+                        IEnumerable<Match> matches =
+                            from match in this._leagueService.GetRecentMatchesAsync(summoner.Id.GetIntId()).Result
+                            where this._documentStore.DatabaseCommands.DocumentExists(match.Id) == false
+                            select match;
+
+                        foreach (var match in matches)
+                        {
+                            documentSession.Store(match);
+                            this.Logger.DebugFormat("Imported match '{0}'.", match.Id);
+                        }
+
+                        summoner.LastMatchImportDate = DateTimeOffset.UtcNow;
+                        summoner.NextMatchImportDate = summoner.LastMatchImportDate.AddMinutes(30);
                     }
 
-                    summoner.NextMatchImportDate = DateTimeOffset.UtcNow.AddMinutes(10);
+                    documentSession.SaveChanges();
                 }
-
-                documentSession.SaveChanges();
+            }
+            catch (Exception exception)
+            {
+                this.Logger.ErrorFormat(exception, "Unhandled exception occured while executing the match import.");
             }
         }
         #endregion
 
         #region Private Methods
-
         /// <summary>
         /// Returns the summoners to load it's matches.
         /// </summary>

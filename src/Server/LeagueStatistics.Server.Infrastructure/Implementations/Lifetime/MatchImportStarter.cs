@@ -41,7 +41,7 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Lifetime
 
             var trigger = TriggerBuilder.Create()
                 .WithSimpleSchedule(f => f
-                    .WithIntervalInSeconds(30)
+                    .WithIntervalInSeconds(15)
                     .RepeatForever())
                 .StartNow()
                 .Build();

@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
+using LeagueStatistics.Shared.Configuration;
 using Raven.Client;
 using Raven.Client.Document;
+using Raven.Client.Indexes;
 
 namespace LeagueStatistics.Server.Infrastructure.Windsor
 {
@@ -38,11 +40,15 @@ namespace LeagueStatistics.Server.Infrastructure.Windsor
         /// </summary>
         private IDocumentStore GetDocumentStore()
         {
-            return new DocumentStore
+            var documentStore = new DocumentStore
             {
-                ConnectionStringName = "LeagueStatistics/RavenDB",
-                DefaultDatabase = "LeagueStatistics"
+                Url = Config.GetValue("RavenDBServer"),
+                DefaultDatabase = Config.GetValue("RavenDBDatabase")
             }.Initialize();
+
+            IndexCreation.CreateIndexes(this.GetType().Assembly, documentStore);
+
+            return documentStore;
         }
         #endregion
     }

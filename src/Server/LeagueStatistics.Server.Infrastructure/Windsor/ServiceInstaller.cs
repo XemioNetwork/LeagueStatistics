@@ -9,6 +9,7 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using LeagueStatistics.Server.Abstractions.Services;
 using LeagueStatistics.Server.Infrastructure.Implementations.Services;
+using LeagueStatistics.Shared.Configuration;
 
 namespace LeagueStatistics.Server.Infrastructure.Windsor
 {
@@ -27,7 +28,7 @@ namespace LeagueStatistics.Server.Infrastructure.Windsor
                 .BasedOn<IService>()
                 .WithServiceFirstInterface()
                 .LifestyleTransient()
-                .ConfigureFor<LeagueService>(f => f.DependsOn(Dependency.OnAppSettingsValue("apiKey", "LeagueStatistics/ApiKey"))));
+                .ConfigureFor<LeagueService>(f => f.DependsOn(Dependency.OnValue("apiKey", Config.GetValue("ApiKey")))));
         }
         #endregion
     }

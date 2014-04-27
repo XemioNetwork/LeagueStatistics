@@ -35,8 +35,12 @@ namespace LeagueStatistics.Shared.Entities
         /// </summary>
         public string Name { get; set; }
         /// <summary>
-        /// Gets or sets the last import date.
+        /// Gets or sets the next import date.
         /// </summary>
         public DateTimeOffset NextMatchImportDate { get; set; }
+        /// <summary>
+        /// Gets or sets the last import date.
+        /// </summary>
+        public DateTimeOffset LastMatchImportDate { get; set; }
     }
 }

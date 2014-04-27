@@ -19,6 +19,11 @@ namespace LeagueStatistics.Shared.Entities
         public string Title { get; set; }
 
         /// <summary>
+        /// Gets or sets the image URL.
+        /// </summary>
+        public string ImageUrl { get; set; }
+        
+        /// <summary>
         /// Gets or sets the movement speed.
         /// </summary>
         public double MovementSpeed { get; set; }

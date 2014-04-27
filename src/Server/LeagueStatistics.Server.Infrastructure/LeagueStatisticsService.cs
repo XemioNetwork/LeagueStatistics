@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LeagueStatistics.Shared.Configuration;
 using Microsoft.Owin.Hosting;
 using Raven.Abstractions.Extensions;
 
@@ -21,7 +22,7 @@ namespace LeagueStatistics.Server.Infrastructure
         /// </summary>
         public void Start()
         {
-            string addresses = ConfigurationManager.AppSettings["LeagueStatistics/Addresses"];
+            string addresses = Config.GetValue("Addresses");
 
             var startOptions = new StartOptions();
             startOptions.Urls.AddRange(addresses.Split('|'));

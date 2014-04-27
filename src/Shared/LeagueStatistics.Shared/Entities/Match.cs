@@ -10,7 +10,7 @@ namespace LeagueStatistics.Shared.Entities
     {
         public string SummonerId { get; set; }
 
-        public DateTime CreationDate { get; set; }
+        public DateTimeOffset CreationDate { get; set; }
 
         public ICollection<FellowPlayer> FellowPlayers { get; set; }
 

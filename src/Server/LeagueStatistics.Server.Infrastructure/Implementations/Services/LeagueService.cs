@@ -58,70 +58,80 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         {
             Condition.Requires(summonerId, "summonerId")
                 .IsNotLessOrEqual(0);
-            
-            IEnumerable<IGame> games = await this._leagueApi.Game.GetRecentGamesBySummonerIdAsync(summonerId);
 
-            return games.Select(f => new Match
+            try
             {
-                Id = string.Format("Summoners/{0}/Matches/{1}", summonerId, f.GameId),
-                SummonerId = string.Format("Summoners/{0}", summonerId),
-                CreationDate = f.CreateDate,
-                FellowPlayers = f.OtherPlayers.Select(d => new FellowPlayer("Champions/" + d.ChampionId, "Summoners/" + d.SummonerId, this.ConvertTeam(d.TeamId))).ToList(),
-                Team = this.ConvertTeam(f.TeamId),
-                GameMode = this.ConvertGameMode(f.GameMode),
-                GameType = this.ConvertGameType(f.GameType),
-                GameSubType = this.ConvertGameSubType(f.GameSubType),
-                MapId = string.Format("Maps/{0}", (int) f.Map),
-                ChampionId = string.Format("Champions/{0}", f.ChampionId),
-                FirstSpellId = string.Format("Spells/{0}", f.SummonerSpells.First()),
-                SecondSpellId = string.Format("Spells/{0}", f.SummonerSpells.Last()),
-                Win = f.Stats.Win,
-                IPEarned = f.IpEarned,
-                Length = TimeSpan.FromSeconds(f.Stats.TimePlayed),
-                TotalHeal = f.Stats.TotalHeal,
-                TotalDamageDealt = f.Stats.TotalDamageDealt,
-                TrueDamageDealt = f.Stats.TrueDamageDealtPlayer,
-                PhysicalDamageDealt = f.Stats.PhysicalDamageDealtPlayer,
-                MagicDamageDealt = f.Stats.MagicDamageDealtPlayer,
-                TotalDamageDealtToChampions = f.Stats.TotalDamageDealtToChampions,
-                TrueDamageDealtToChampions = f.Stats.TrueDamageDealtToChampions,
-                PhysicalDamageDealtToChampions = f.Stats.PhysicalDamageDealtToChampions,
-                MagicDamageDealtToChampions = f.Stats.MagicDamageDealtToChampions,
-                TotalDamageTaken = f.Stats.TotalDamageTaken,
-                TrueDamageTaken = f.Stats.TrueDamageTaken,
-                PhysicalDamageTaken = f.Stats.PhysicalDamageTaken,
-                MagicDamageTaken = f.Stats.MagicDamageTaken,
-                Level = f.Stats.Level,
-                GoldEarned = f.Stats.GoldEarned,
-                GoldSpent = f.Stats.GoldSpent,
-                Item1Id = this.ConvertItemId(f.Stats.ItemIds[0]),
-                Item2Id = this.ConvertItemId(f.Stats.ItemIds[1]),
-                Item3Id = this.ConvertItemId(f.Stats.ItemIds[2]),
-                Item4Id = this.ConvertItemId(f.Stats.ItemIds[3]),
-                Item5Id = this.ConvertItemId(f.Stats.ItemIds[4]),
-                Item6Id = this.ConvertItemId(f.Stats.ItemIds[5]),
-                SightWardsBought = f.Stats.SightWardsBought,
-                WardsKilled = f.Stats.WardKilled,
-                WardsPlaced = f.Stats.WardPlaced,
-                ChampionsKilled = f.Stats.ChampionsKilled,
-                Assists = f.Stats.Assists,
-                Deaths = f.Stats.NumDeaths,
-                MinionsKilled = f.Stats.MinionsKilled,
-                NeutralMinionsKilledYourJungle = f.Stats.NeutralMinionsKilledYourJungle,
-                NeutralMinionsKilledEnemyJungle = f.Stats.NeutralMinionsKilledEnemyJungle,
-                LargestMultiKill = f.Stats.LargestMultiKill
-            });
+                IEnumerable<IGame> games = await this._leagueApi.Game.GetRecentGamesBySummonerIdAsync(summonerId);
+
+                return games.Select(f => new Match
+                {
+                    Id = string.Format("Summoners/{0}/Matches/{1}", summonerId, f.GameId),
+                    SummonerId = string.Format("Summoners/{0}", summonerId),
+                    CreationDate = f.CreateDate,
+                    FellowPlayers = f.OtherPlayers.Select(d => new FellowPlayer("Champions/" + d.ChampionId, "Summoners/" + d.SummonerId, this.ConvertTeam(d.TeamId))).ToList(),
+                    Team = this.ConvertTeam(f.TeamId),
+                    GameMode = this.ConvertGameMode(f.GameMode),
+                    GameType = this.ConvertGameType(f.GameType),
+                    GameSubType = this.ConvertGameSubType(f.GameSubType),
+                    MapId = string.Format("Maps/{0}", (int) f.Map),
+                    ChampionId = string.Format("Champions/{0}", f.ChampionId),
+                    FirstSpellId = string.Format("Spells/{0}", f.SummonerSpells.First()),
+                    SecondSpellId = string.Format("Spells/{0}", f.SummonerSpells.Last()),
+                    Win = f.Stats.Win,
+                    IPEarned = f.IpEarned,
+                    Length = TimeSpan.FromSeconds(f.Stats.TimePlayed),
+                    TotalHeal = f.Stats.TotalHeal,
+                    TotalDamageDealt = f.Stats.TotalDamageDealt,
+                    TrueDamageDealt = f.Stats.TrueDamageDealtPlayer,
+                    PhysicalDamageDealt = f.Stats.PhysicalDamageDealtPlayer,
+                    MagicDamageDealt = f.Stats.MagicDamageDealtPlayer,
+                    TotalDamageDealtToChampions = f.Stats.TotalDamageDealtToChampions,
+                    TrueDamageDealtToChampions = f.Stats.TrueDamageDealtToChampions,
+                    PhysicalDamageDealtToChampions = f.Stats.PhysicalDamageDealtToChampions,
+                    MagicDamageDealtToChampions = f.Stats.MagicDamageDealtToChampions,
+                    TotalDamageTaken = f.Stats.TotalDamageTaken,
+                    TrueDamageTaken = f.Stats.TrueDamageTaken,
+                    PhysicalDamageTaken = f.Stats.PhysicalDamageTaken,
+                    MagicDamageTaken = f.Stats.MagicDamageTaken,
+                    Level = f.Stats.Level,
+                    GoldEarned = f.Stats.GoldEarned,
+                    GoldSpent = f.Stats.GoldSpent,
+                    Item1Id = this.ConvertItemId(f.Stats.ItemIds[0]),
+                    Item2Id = this.ConvertItemId(f.Stats.ItemIds[1]),
+                    Item3Id = this.ConvertItemId(f.Stats.ItemIds[2]),
+                    Item4Id = this.ConvertItemId(f.Stats.ItemIds[3]),
+                    Item5Id = this.ConvertItemId(f.Stats.ItemIds[4]),
+                    Item6Id = this.ConvertItemId(f.Stats.ItemIds[5]),
+                    SightWardsBought = f.Stats.SightWardsBought,
+                    WardsKilled = f.Stats.WardKilled,
+                    WardsPlaced = f.Stats.WardPlaced,
+                    ChampionsKilled = f.Stats.ChampionsKilled,
+                    Assists = f.Stats.Assists,
+                    Deaths = f.Stats.NumDeaths,
+                    MinionsKilled = f.Stats.MinionsKilled,
+                    NeutralMinionsKilledYourJungle = f.Stats.NeutralMinionsKilledYourJungle,
+                    NeutralMinionsKilledEnemyJungle = f.Stats.NeutralMinionsKilledEnemyJungle,
+                    LargestMultiKill = f.Stats.LargestMultiKill
+                });
+            }
+            catch (Exception exception)
+            {
+                this.Logger.ErrorFormat(exception, "Unhandled exception in 'GetRecentMatchesAsync' for summoner '{0}'.", summonerId);
+                return new List<Match>();
+            }
         }
         /// <summary>
         /// Returns all champions.
         /// </summary>
         public async Task<IEnumerable<Champion>> GetChampionsAsync()
         {
-            IChampionList champions = await this._leagueApi.Static.GetChampionsAsync(champData: ChampDataEnum.Stats);
+            IChampionList champions = await this._leagueApi.Static.GetChampionsAsync(champData: ChampDataEnum.All);
+
             return champions.Data.Values.Select(f => new Champion
             {
                 Id = string.Format("Champions/{0}", f.Id),
                 Name = f.Name,
+                ImageUrl = f.Image.GetUrlAsync().Result,
                 Title = f.Title,
                 MovementSpeed = f.Stats.Movespeed,
                 AttackRange = f.Stats.Attackrange,
@@ -150,14 +160,15 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         /// </summary>
         public async Task<IEnumerable<Spell>> GetSpellsAsync()
         {
-            ISummonerSpellList spells = await this._leagueApi.Static.GetSummonerSpellsAsync();
+            ISummonerSpellList spells = await this._leagueApi.Static.GetSummonerSpellsAsync(itemData: SpellDataEnum.All);
 
             return spells.Data.Values.Select(f => new Spell
             {
                 Id = string.Format("Spells/{0}", f.Id),
                 Name = f.Name,
                 Description = f.Description,
-                Cooldown = f.Cooldown.FirstOrDefault()
+                Cooldown = f.Cooldown.FirstOrDefault(),
+                ImageUrl = f.Image.GetUrlAsync().Result,
             });
         }
         /// <summary>
@@ -181,13 +192,14 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         /// </summary>
         public async Task<IEnumerable<Item>> GetItemsAsync()
         {
-            IItemList items = await this._leagueApi.Static.GetItemsAsync();
+            IItemList items = await this._leagueApi.Static.GetItemsAsync(itemData: ItemDataEnum.All);
 
             return items.Data.Values.Select(f => new Item
             {
                 Id = string.Format("Items/{0}", f.Id),
                 Name = f.Name,
-                Description = f.Description.StripHtmlTags()
+                Description = f.Description.StripHtmlTags(),
+                ImageUrl = f.Image.GetUrlAsync().Result
             });
         }
         /// <summary>
@@ -201,7 +213,7 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
 
             ISummoner summoner = await this._leagueApi.Summoner.GetSummonerByNameAsync(name);
 
-            return new Summoner(summoner.SummonerId, name);
+            return new Summoner(summoner.SummonerId, summoner.Name);
         }
         #endregion
 

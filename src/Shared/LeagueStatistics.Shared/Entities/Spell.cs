@@ -10,6 +10,7 @@ namespace LeagueStatistics.Shared.Entities
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public int Cooldown { get; set; }
+        public double Cooldown { get; set; }
+        public string ImageUrl { get; set; }
     }
 }
