@@ -9,6 +9,7 @@ namespace LeagueStatistics.Shared.Models
     public class SummonerStatistics
     {
         public string SummonerId { get; set; }
+        public string SummonerName { get; set; }
 
         public int MatchCount { get; set; }
         public int WinCount { get; set; }
@@ -37,8 +38,16 @@ namespace LeagueStatistics.Shared.Models
         public double AvgGoldEarned { get; set; }
         public double MinGoldEarned { get; set; }
 
+        public double MaxGoldPerMinute { get; set; }
+        public double AvgGoldPerMinute { get; set; }
+        public double MinGoldPerMinute { get; set; }
+
         public double MaxMinionsKilled { get; set; }
         public double AvgMinionsKilled { get; set; }
         public double MinMinionsKilled { get; set; }
+
+        public double MaxMinionsKilledPerMinute { get; set; }
+        public double AvgMinionsKilledPerMinute { get; set; }
+        public double MinMinionsKilledPerMinute { get; set; }
     }
 }

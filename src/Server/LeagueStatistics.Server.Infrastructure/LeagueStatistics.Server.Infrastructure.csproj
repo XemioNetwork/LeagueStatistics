@@ -193,6 +193,7 @@
     <Compile Include="Controllers\SpellsController.cs" />
     <Compile Include="Controllers\SummonersController.cs" />
     <Compile Include="Extensions\IDatabaseCommandsExtensions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\DocumentStoreExtensions.cs" />
     <Compile Include="Extensions\ExpressionExtensions.cs" />
@@ -216,7 +217,9 @@
     <Compile Include="Windsor\WindsorDependencyScope.cs" />
     <Compile Include="Windsor\WindsorResolver.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Raven\Transformers\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="NLog.config">

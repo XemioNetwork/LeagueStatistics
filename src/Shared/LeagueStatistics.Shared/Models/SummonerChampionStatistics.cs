@@ -9,5 +9,8 @@ namespace LeagueStatistics.Shared.Models
     public class SummonerChampionStatistics : SummonerStatistics
     {
         public string ChampionId { get; set; }
+        public string ChampionName { get; set; }
+        public string ChampionTitle { get; set; }
+        public string ChampionImageUrl { get; set; }
     }
 }

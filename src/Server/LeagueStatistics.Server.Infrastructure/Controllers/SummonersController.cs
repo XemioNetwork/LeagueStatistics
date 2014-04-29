@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using CuttingEdge.Conditions;
 using LeagueStatistics.Server.Abstractions.Services;
+using LeagueStatistics.Server.Infrastructure.Extensions;
 using LeagueStatistics.Server.Infrastructure.Filters;
 using LeagueStatistics.Shared.Entities;
 using Raven.Client;
@@ -41,9 +42,14 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         /// Returns a list of all summoners.
         /// </summary>
         [Route("Summoners")]
-        public IHttpActionResult GetSummoners()
+        public IHttpActionResult GetSummoners(int page, int pageSize)
         {
-            return Ok();
+            var summoners = this.DocumentSession.Query<Summoner>()
+                .OrderBy(f => f.Id)
+                .Page(page, pageSize)
+                .ToList();
+
+            return this.Ok(summoners);
         }
         /// <summary>
         /// Patches the summoners.
