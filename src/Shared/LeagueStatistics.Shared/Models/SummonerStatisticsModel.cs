@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace LeagueStatistics.Shared.Models
 {
-    public class SummonerStatistics
+    public class SummonerStatisticsModel
     {
         public string SummonerId { get; set; }
         public string SummonerName { get; set; }
 
         public int MatchCount { get; set; }
+        public double WinPercentage { get; set; }
         public int WinCount { get; set; }
         public int LoseCount { get; set; }
 

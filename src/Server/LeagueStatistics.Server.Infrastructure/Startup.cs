@@ -52,11 +52,9 @@ namespace LeagueStatistics.Server.Infrastructure
         private void ConfigureWindsor(HttpConfiguration config)
         {
             var container = new WindsorContainer();
-
             container.AddFacility<LoggingFacility>(f => f.UseNLog());
             container.AddFacility<StartableFacility>();
-
-            container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
+            container.AddFacility<ArrayFacility>();
 
             container.Install(FromAssembly.This());
 

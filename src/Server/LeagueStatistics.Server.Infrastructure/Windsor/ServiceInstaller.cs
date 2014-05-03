@@ -10,6 +10,7 @@ using Castle.Windsor;
 using LeagueStatistics.Server.Abstractions.Services;
 using LeagueStatistics.Server.Infrastructure.Implementations.Services;
 using LeagueStatistics.Shared.Configuration;
+using PortableLeagueApi.Interfaces.Enums;
 
 namespace LeagueStatistics.Server.Infrastructure.Windsor
 {
@@ -28,7 +29,8 @@ namespace LeagueStatistics.Server.Infrastructure.Windsor
                 .BasedOn<IService>()
                 .WithServiceFirstInterface()
                 .LifestyleTransient()
-                .ConfigureFor<LeagueService>(f => f.DependsOn(Dependency.OnValue("apiKey", Config.GetValue("ApiKey")))));
+                .ConfigureFor<LeagueService>(f => f.DependsOn(Dependency.OnValue("apiKey", Config.GetValue("ApiKey")),
+                                                              Dependency.OnValue("region", Enum.Parse(typeof(RegionEnum), Config.GetValue("Region"))))));
         }
         #endregion
     }

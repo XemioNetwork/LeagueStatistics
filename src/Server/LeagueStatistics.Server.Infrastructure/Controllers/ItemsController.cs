@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using CuttingEdge.Conditions;
 using LeagueStatistics.Server.Abstractions.Services;
+using LeagueStatistics.Server.Infrastructure.Extensions;
 using LeagueStatistics.Server.Infrastructure.Filters;
+using LeagueStatistics.Server.Infrastructure.Raven.Transformers;
 using LeagueStatistics.Shared.Entities;
+using LeagueStatistics.Shared.Models;
 using Raven.Client;
 
 namespace LeagueStatistics.Server.Infrastructure.Controllers
@@ -35,6 +38,51 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Returns all items.
+        /// </summary>
+        [Route("Items")]
+        public IHttpActionResult GetItems()
+        {
+            var items = this.DocumentSession.Query<Item>()
+                .TransformWith<ItemToItemModelTransformer, ItemModel>()
+                .OrderBy(f => f.Id)
+                .Take(1000)
+                .ToList();
+
+            return Ok(items);
+        }
+
+        /// <summary>
+        /// Returns the item with the specified <paramref name="itemId"/>.
+        /// </summary>
+        /// <param name="itemId">The item id.</param>
+        [Route("Items/{itemId:int}")]
+        public IHttpActionResult GetItem(int itemId)
+        {
+            var stringId = this.DocumentSession.Advanced.GetStringIdFor<Item>(itemId);
+            var item = this.DocumentSession.Load<ItemToItemModelTransformer, ItemModel>(stringId);
+
+            if (item == null)
+                return NotFound();
+
+            return Ok(item);
+        }
+        /// <summary>
+        /// Returns the details for the item with the specified <paramref name="itemId"/>.
+        /// </summary>
+        /// <param name="itemId">The item identifier.</param>
+        [Route("Items/{itemId:int}/Details")]
+        public IHttpActionResult GetItemDetails(int itemId)
+        {
+            var stringId = this.DocumentSession.Advanced.GetStringIdFor<Item>(itemId);
+            var item = this.DocumentSession.Load<ItemToItemDetailModelTransformer, ItemDetailModel>(stringId);
+
+            if (item == null)
+                return NotFound();
+
+            return Ok(item);
+        }
         /// <summary>
         /// Updates all item data.
         /// </summary>

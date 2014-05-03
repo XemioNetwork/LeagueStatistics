@@ -16,7 +16,7 @@ namespace LeagueStatistics.Server.Infrastructure.Extensions
         /// <param name="queryable">The queryable.</param>
         /// <param name="page">The page starting with 1.</param>
         /// <param name="pageSize">Size of the page.</param>
-        public static IEnumerable<T> Page<T>(this IEnumerable<T> queryable, int page, int pageSize)
+        public static IEnumerable<T> Paging<T>(this IEnumerable<T> queryable, int page, int pageSize)
         {
             return queryable
                 .Skip((page - 1)*pageSize)

@@ -53,8 +53,14 @@
     <Compile Include="Entities\Summoner.cs" />
     <Compile Include="Entities\AggregateRoot.cs" />
     <Compile Include="Entities\Team.cs" />
-    <Compile Include="Models\SummonerChampionStatistics.cs" />
-    <Compile Include="Models\SummonerStatistics.cs" />
+    <Compile Include="Models\ChampionDetailModel.cs" />
+    <Compile Include="Models\ChampionModel.cs" />
+    <Compile Include="Models\ItemDetailModel.cs" />
+    <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="Entities\ItemOnMap.cs" />
+    <Compile Include="Models\SummonerChampionStatisticsModel.cs" />
+    <Compile Include="Models\SummonerModel.cs" />
+    <Compile Include="Models\SummonerStatisticsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

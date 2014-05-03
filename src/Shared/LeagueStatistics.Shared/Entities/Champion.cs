@@ -112,15 +112,5 @@ namespace LeagueStatistics.Shared.Entities
         /// Gets or sets the crit per level.
         /// </summary>
         public double CritPerLevel { get; set; }
-
-        #region Methods
-        /// <summary>
-        /// Returns the display name.
-        /// </summary>
-        public string GetDisplayName()
-        {
-            return this.Name + this.Title;
-        }
-        #endregion
     }
 }

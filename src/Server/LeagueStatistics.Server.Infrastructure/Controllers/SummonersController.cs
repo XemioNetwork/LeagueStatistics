@@ -6,11 +6,14 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Results;
 using CuttingEdge.Conditions;
 using LeagueStatistics.Server.Abstractions.Services;
 using LeagueStatistics.Server.Infrastructure.Extensions;
 using LeagueStatistics.Server.Infrastructure.Filters;
+using LeagueStatistics.Server.Infrastructure.Raven.Transformers;
 using LeagueStatistics.Shared.Entities;
+using LeagueStatistics.Shared.Models;
 using Raven.Client;
 
 namespace LeagueStatistics.Server.Infrastructure.Controllers
@@ -42,26 +45,42 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         /// Returns a list of all summoners.
         /// </summary>
         [Route("Summoners")]
-        public IHttpActionResult GetSummoners(int page, int pageSize)
+        public IHttpActionResult GetSummoners(int page = 1, int pageSize = 50)
         {
             var summoners = this.DocumentSession.Query<Summoner>()
+                .TransformWith<SummonerToSummonerModelTransformer, SummonerModel>()
                 .OrderBy(f => f.Id)
-                .Page(page, pageSize)
+                .Paging(page, pageSize)
                 .ToList();
 
-            return this.Ok(summoners);
+            return Ok(summoners);
+        }
+        /// <summary>
+        /// Gets the summoner.
+        /// </summary>
+        /// <param name="summonerId">The summoner identifier.</param>
+        [Route("Summoners/{summonerId:int}")]
+        public IHttpActionResult GetSummoner(int summonerId)
+        {
+            var stringId = this.DocumentSession.Advanced.GetStringIdFor<Summoner>(summonerId);
+            var summoner = this.DocumentSession.Load<SummonerToSummonerModelTransformer, SummonerModel>(stringId);
+
+            if (summoner == null)
+                return NotFound();
+
+            return Ok(summoner);
         }
         /// <summary>
         /// Patches the summoners.
         /// </summary>
         [Route("Summoners/Add/{username}")]
         [RequiresAuthentication]
-        public async Task<HttpResponseMessage> GetAddSummoner(string username)
+        public async Task<IHttpActionResult> GetAddSummoner(string username)
         {
             Summoner summoner = await this._leagueService.GetSummonerAsync(username);
             this.DocumentSession.Store(summoner);
 
-            return Request.CreateResponse(HttpStatusCode.Created, summoner);
+            return new ResponseMessageResult(Request.CreateResponse(HttpStatusCode.Created));
         }
         #endregion
     }

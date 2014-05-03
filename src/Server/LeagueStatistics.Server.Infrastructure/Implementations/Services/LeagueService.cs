@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper.Internal;
@@ -8,6 +9,7 @@ using CuttingEdge.Conditions;
 using LeagueStatistics.Server.Abstractions.Services;
 using LeagueStatistics.Server.Infrastructure.Extensions;
 using LeagueStatistics.Shared.Entities;
+using LeagueStatistics.Shared.Models;
 using PortableLeagueAPI;
 using PortableLeagueApi.Game.Models;
 using PortableLeagueApi.Interfaces.Champion;
@@ -39,13 +41,14 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         /// Initializes a new instance of the <see cref="LeagueService" /> class.
         /// </summary>
         /// <param name="apiKey">The API key.</param>
-        public LeagueService(string apiKey)
+        /// <param name="region">The region.</param>
+        public LeagueService(string apiKey, RegionEnum region)
         {
             Condition.Requires(apiKey, "apiKey")
                 .IsNotNullOrWhiteSpace();
 
             this.Logger = NullLogger.Instance;
-            this._leagueApi = new LeagueApi(apiKey, RegionEnum.Euw);
+            this._leagueApi = new LeagueApi(apiKey, region);
         }
         #endregion
         
@@ -68,7 +71,7 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
                     Id = string.Format("Summoners/{0}/Matches/{1}", summonerId, f.GameId),
                     SummonerId = string.Format("Summoners/{0}", summonerId),
                     CreationDate = f.CreateDate,
-                    FellowPlayers = f.OtherPlayers.Select(d => new FellowPlayer("Champions/" + d.ChampionId, "Summoners/" + d.SummonerId, this.ConvertTeam(d.TeamId))).ToList(),
+                    FellowPlayers = f.OtherPlayers.Select(d => new FellowPlayer(string.Format("Champions/{0}", d.ChampionId), string.Format("Summoners/{0}", d.SummonerId), this.ConvertTeam(d.TeamId))).ToList(),
                     Team = this.ConvertTeam(f.TeamId),
                     GameMode = this.ConvertGameMode(f.GameMode),
                     GameType = this.ConvertGameType(f.GameType),
@@ -176,7 +179,7 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         /// </summary>
         public Task<IEnumerable<Map>> GetMapsAsync()
         {
-            return Task.Factory.StartNew(() => (IEnumerable<Map>)new List<Map>
+            return Task.FromResult((IEnumerable<Map>) new List<Map>
             {
                 new Map(1, "Summoner's Rift"),
                 new Map(2, "Summoner's Rift"),
@@ -192,14 +195,38 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         /// </summary>
         public async Task<IEnumerable<Item>> GetItemsAsync()
         {
-            IItemList items = await this._leagueApi.Static.GetItemsAsync(itemData: ItemDataEnum.All);
+            List<Map> maps = (await this.GetMapsAsync()).ToList();
+            IItemList items = await this._leagueApi.Static.GetItemsAsync(ItemDataEnum.All);
 
-            return items.Data.Values.Select(f => new Item
+            return items.Data.Values.Select(f =>
             {
-                Id = string.Format("Items/{0}", f.Id),
-                Name = f.Name,
-                Description = f.Description.StripHtmlTags(),
-                ImageUrl = f.Image.GetUrlAsync().Result
+                var item = new Item
+                {
+                    Id = string.Format("Items/{0}", f.Id),
+                    Name = f.Name,
+                    Description = f.Plaintext,
+                    ImageUrl = f.Image.GetUrlAsync().Result,
+                    StatsText = f.SanitizedDescription,
+                    AvailableOnMaps = maps.Select(m => new ItemOnMap
+                    {
+                        MapId = m.Id,
+                        IsAvailable = true
+                    }).ToList(),
+                    BuildsInto = f.Into.Select(i => string.Format("Items/{0}", i)).ToList(),
+                    BuildsFrom = f.From.Select(i => string.Format("Items/{0}", i)).ToList(),
+                    Purchasable = f.Gold.Purchasable,
+                    SellPrice = f.Gold.Sell,
+                    Price = f.Gold.Base,
+                    TotalPrice = f.Gold.Total,
+                    Tags = f.Tags
+                };
+
+                foreach (var map in f.Maps)
+                {
+                    item.AvailableOnMaps.First(m => m.MapId == string.Format("Maps/{0}", map.Key)).IsAvailable = map.Value;
+                }
+
+                return item;
             });
         }
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using LeagueStatistics.Shared.Entities;
@@ -11,22 +10,29 @@ using Raven.Client.Indexes;
 
 namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
 {
-    public class MatchesBySummonerStatistics : AbstractIndexCreationTask<Match, SummonerStatistics>
+    public class MatchesBySummonerChampionStatisticsIndex : AbstractIndexCreationTask<Match, SummonerChampionStatisticsModel>
     {
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchesBySummonerStatistics"/> class.
+        /// Initializes a new instance of the <see cref="MatchesBySummonerChampionStatisticsIndex"/> class.
         /// </summary>
-        public MatchesBySummonerStatistics()
+        public MatchesBySummonerChampionStatisticsIndex()
         {
             this.Map = matches => from match in matches
                                   let summoner = LoadDocument<Summoner>(match.SummonerId)
-                                  select new SummonerStatistics
+                                  let champion = LoadDocument<Champion>(match.ChampionId)
+                                  select new SummonerChampionStatisticsModel
                                   {
                                       SummonerId = match.SummonerId,
                                       SummonerName = summoner.Name,
-                                      
+
+                                      ChampionId = match.ChampionId,
+                                      ChampionName = champion.Name,
+                                      ChampionTitle = champion.Title,
+                                      ChampionImageUrl = champion.ImageUrl,
+
                                       MatchCount = 1,
+                                      WinPercentage = 0.0,
                                       WinCount = match.Win ? 1 : 0,
                                       LoseCount = match.Win ? 0 : 1,
 
@@ -67,36 +73,43 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
                                   };
 
             this.Reduce = matches => from match in matches
-                                     group match by match.SummonerId  into g
+                                     group match by new { match.SummonerId, match.ChampionId } into g
                                      let matchCount = g.Sum(f => f.MatchCount)
-                                     select new SummonerStatistics
+                                     let winCount = g.Sum(f => f.WinCount)
+                                     select new SummonerChampionStatisticsModel
                                      {
-                                         SummonerId = g.Key,
+                                         SummonerId = g.Key.SummonerId,
                                          SummonerName = g.Select(f => f.SummonerName).First(),
 
+                                         ChampionId = g.Key.ChampionId,
+                                         ChampionName = g.Select(f => f.ChampionName).First(),
+                                         ChampionTitle = g.Select(f => f.ChampionTitle).First(),
+                                         ChampionImageUrl = g.Select(f => f.ChampionImageUrl).First(),
+
                                          MatchCount = matchCount,
-                                         WinCount = g.Sum(f => f.WinCount),
+                                         WinPercentage = winCount / (double)(matchCount == 0 ? 1 : matchCount) * 100,
+                                         WinCount = winCount,
                                          LoseCount = g.Sum(f => f.LoseCount),
-                                     
+
                                          MaxLenght = g.Max(f => f.MaxLenght),
                                          AvgLenght = TimeSpan.FromTicks(g.Sum(f => f.AvgLenght.Ticks) / matchCount),
                                          MinLength = g.Min(f => f.MinLength),
-                                     
+
                                          LastMatch = g.Max(f => f.LastMatch),
                                          FirstMatch = g.Min(f => f.FirstMatch),
-                                     
+
                                          MaxChampionsKilled = g.Max(f => f.MaxChampionsKilled),
                                          AvgChampionsKilled = g.Sum(f => f.AvgChampionsKilled) / matchCount,
                                          MinChampionsKilled = g.Min(f => f.MinChampionsKilled),
-                                     
+
                                          MaxAssists = g.Max(f => f.MaxAssists),
                                          AvgAssists = g.Sum(f => f.AvgAssists) / matchCount,
                                          MinAssists = g.Min(f => f.MinAssists),
-                                     
+
                                          MaxDeaths = g.Max(f => f.MaxDeaths),
                                          AvgDeaths = g.Sum(f => f.AvgDeaths) / matchCount,
                                          MinDeaths = g.Min(f => f.MinDeaths),
-                                     
+
                                          MaxGoldEarned = g.Max(f => f.MaxGoldEarned),
                                          AvgGoldEarned = g.Sum(f => f.AvgGoldEarned) / matchCount,
                                          MinGoldEarned = g.Min(f => f.MinGoldEarned),
@@ -104,17 +117,20 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
                                          MaxGoldPerMinute = g.Max(f => f.MaxGoldPerMinute),
                                          AvgGoldPerMinute = g.Sum(f => f.AvgGoldPerMinute) / matchCount,
                                          MinGoldPerMinute = g.Min(f => f.MinGoldPerMinute),
-                                     
+
                                          MaxMinionsKilled = g.Max(f => f.MaxMinionsKilled),
                                          AvgMinionsKilled = g.Sum(f => f.AvgMinionsKilled) / matchCount,
                                          MinMinionsKilled = g.Min(f => f.MinMinionsKilled),
-                                         
+
                                          MaxMinionsKilledPerMinute = g.Max(f => f.MaxMinionsKilledPerMinute),
                                          AvgMinionsKilledPerMinute = g.Sum(f => f.AvgMinionsKilledPerMinute) / matchCount,
                                          MinMinionsKilledPerMinute = g.Min(f => f.MinMinionsKilledPerMinute)
                                      };
 
             this.Index(f => f.SummonerName, FieldIndexing.Analyzed);
+
+            this.Index(f => f.ChampionName, FieldIndexing.Analyzed);
+            this.Index(f => f.ChampionTitle, FieldIndexing.Analyzed);
 
             this.Sort(f => f.MatchCount, SortOptions.Int);
             this.Sort(f => f.WinCount, SortOptions.Int);
@@ -152,7 +168,7 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
         /// </summary>
         public override string IndexName
         {
-            get { return "Matches/BySummonerStatistics"; }
+            get { return "Matches/BySummonerChampionStatistics"; }
         }
         #endregion
     }
