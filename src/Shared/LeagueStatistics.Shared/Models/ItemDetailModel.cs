@@ -23,11 +23,4 @@ namespace LeagueStatistics.Shared.Models
         public int TotalPrice { get; set; }
         public ICollection<string> Tags { get; set; }
     }
-
-    public class ItemOnMapModel
-    {
-        public int MapId { get; set; }
-        public string MapName { get; set; }
-        public bool IsAvailable { get; set; }
-    }
 }

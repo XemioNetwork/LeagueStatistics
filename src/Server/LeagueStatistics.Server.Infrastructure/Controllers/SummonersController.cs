@@ -47,6 +47,11 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [Route("Summoners")]
         public IHttpActionResult GetSummoners(int page = 1, int pageSize = 50)
         {
+            Condition.Requires(page, "page")
+                .IsGreaterThan(0);
+            Condition.Requires(pageSize, "pageSize")
+                .IsGreaterThan(0);
+
             var summoners = this.DocumentSession.Query<Summoner>()
                 .TransformWith<SummonerToSummonerModelTransformer, SummonerModel>()
                 .OrderBy(f => f.Id)
@@ -62,6 +67,9 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [Route("Summoners/{summonerId:int}")]
         public IHttpActionResult GetSummoner(int summonerId)
         {
+            Condition.Requires(summonerId, "summonerId")
+                .IsGreaterThan(0);
+
             var stringId = this.DocumentSession.Advanced.GetStringIdFor<Summoner>(summonerId);
             var summoner = this.DocumentSession.Load<SummonerToSummonerModelTransformer, SummonerModel>(stringId);
 
@@ -77,6 +85,9 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [RequiresAuthentication]
         public async Task<IHttpActionResult> GetAddSummoner(string username)
         {
+            Condition.Requires(username, "username")
+                .IsNotNullOrWhiteSpace();
+
             Summoner summoner = await this._leagueService.GetSummonerAsync(username);
             this.DocumentSession.Store(summoner);
 

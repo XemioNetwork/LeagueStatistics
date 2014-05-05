@@ -61,6 +61,9 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [Route("Champions/{championId:int}")]
         public IHttpActionResult GetChampion(int championId)
         {
+            Condition.Requires(championId, "championId")
+                .IsGreaterThan(0);
+
             var stringId = this.DocumentSession.Advanced.GetStringIdFor<Champion>(championId);
             var details = this.DocumentSession.Load<ChampionToChampionModelTransformer, ChampionModel>(stringId);
 
@@ -76,6 +79,9 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [Route("Champions/{championId:int}/Details")]
         public IHttpActionResult GetChampionDetails(int championId)
         {
+            Condition.Requires(championId, "championId")
+                .IsGreaterThan(0);
+
             var stringId = this.DocumentSession.Advanced.GetStringIdFor<Champion>(championId);
             var details = this.DocumentSession.Load<ChampionToChampionDetailModelTransformer, ChampionDetailModel>(stringId);
 

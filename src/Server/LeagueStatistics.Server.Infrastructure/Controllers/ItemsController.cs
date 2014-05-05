@@ -47,12 +47,11 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
             var items = this.DocumentSession.Query<Item>()
                 .TransformWith<ItemToItemModelTransformer, ItemModel>()
                 .OrderBy(f => f.Id)
-                .Take(1000)
+                .Take(512) //Just some value because CURRENTLY there are only about 250 items, so no paging needed
                 .ToList();
 
             return Ok(items);
         }
-
         /// <summary>
         /// Returns the item with the specified <paramref name="itemId"/>.
         /// </summary>
@@ -60,6 +59,9 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [Route("Items/{itemId:int}")]
         public IHttpActionResult GetItem(int itemId)
         {
+            Condition.Requires(itemId, "itemId")
+                .IsGreaterThan(0);
+
             var stringId = this.DocumentSession.Advanced.GetStringIdFor<Item>(itemId);
             var item = this.DocumentSession.Load<ItemToItemModelTransformer, ItemModel>(stringId);
 
@@ -75,6 +77,9 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         [Route("Items/{itemId:int}/Details")]
         public IHttpActionResult GetItemDetails(int itemId)
         {
+            Condition.Requires(itemId, "itemId")
+                .IsGreaterThan(0);
+
             var stringId = this.DocumentSession.Advanced.GetStringIdFor<Item>(itemId);
             var item = this.DocumentSession.Load<ItemToItemDetailModelTransformer, ItemDetailModel>(stringId);
 

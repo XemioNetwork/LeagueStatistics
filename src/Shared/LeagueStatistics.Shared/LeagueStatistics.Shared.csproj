@@ -58,6 +58,9 @@
     <Compile Include="Models\ItemDetailModel.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Entities\ItemOnMap.cs" />
+    <Compile Include="Models\ItemOnMapModel.cs" />
+    <Compile Include="Models\MapModel.cs" />
+    <Compile Include="Models\SpellModel.cs" />
     <Compile Include="Models\SummonerChampionStatisticsModel.cs" />
     <Compile Include="Models\SummonerModel.cs" />
     <Compile Include="Models\SummonerStatisticsModel.cs" />

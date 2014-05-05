@@ -172,6 +172,7 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
                 Description = f.Description,
                 Cooldown = f.Cooldown.FirstOrDefault(),
                 ImageUrl = f.Image.GetUrlAsync().Result,
+                SummonerLevel = f.SummonerLevel
             });
         }
         /// <summary>

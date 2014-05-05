@@ -23,6 +23,7 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
                                   let summoner = LoadDocument<Summoner>(match.SummonerId)
                                   select new SummonerStatisticsModel
                                   {
+                                      GameType = match.GameSubType,
                                       SummonerId = match.SummonerId,
                                       SummonerName = summoner.Name,
                                       
@@ -68,12 +69,13 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
                                   };
 
             this.Reduce = matches => from match in matches
-                                     group match by match.SummonerId  into g
+                                     group match by new { match.SummonerId, match.GameType }  into g
                                      let matchCount = g.Sum(f => f.MatchCount)
                                      let winCount = g.Sum(f => f.WinCount)
                                      select new SummonerStatisticsModel
                                      {
-                                         SummonerId = g.Key,
+                                         GameType = g.Key.GameType,
+                                         SummonerId = g.Key.SummonerId,
                                          SummonerName = g.Select(f => f.SummonerName).First(),
 
                                          MatchCount = matchCount,
@@ -120,6 +122,7 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
             this.Index(f => f.SummonerName, FieldIndexing.Analyzed);
 
             this.Sort(f => f.MatchCount, SortOptions.Int);
+            this.Sort(f => f.WinPercentage, SortOptions.Double);
             this.Sort(f => f.WinCount, SortOptions.Int);
             this.Sort(f => f.LoseCount, SortOptions.Int);
 
@@ -134,6 +137,10 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Indexes
             this.Sort(f => f.MaxDeaths, SortOptions.Double);
             this.Sort(f => f.AvgDeaths, SortOptions.Double);
             this.Sort(f => f.MinDeaths, SortOptions.Double);
+
+            this.Sort(f => f.MaxGoldEarned, SortOptions.Double);
+            this.Sort(f => f.AvgGoldEarned, SortOptions.Double);
+            this.Sort(f => f.MinGoldEarned, SortOptions.Double);
 
             this.Sort(f => f.MaxGoldPerMinute, SortOptions.Double);
             this.Sort(f => f.AvgGoldPerMinute, SortOptions.Double);

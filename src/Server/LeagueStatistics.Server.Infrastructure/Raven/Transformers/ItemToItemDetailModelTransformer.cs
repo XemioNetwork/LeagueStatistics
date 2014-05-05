@@ -62,7 +62,7 @@ namespace LeagueStatistics.Server.Infrastructure.Raven.Transformers
 
         #region Overrides of AbstractTransformerCreationTask
         /// <summary>
-        /// Gets the name of the index.
+        /// Gets the name of the transformer.
         /// </summary>
         public override string TransformerName
         {

@@ -212,6 +212,8 @@
     <Compile Include="Raven\Transformers\ChampionToChampionModelTransformer.cs" />
     <Compile Include="Raven\Transformers\ItemToItemDetailModelTransformer.cs" />
     <Compile Include="Raven\Transformers\ItemToItemModelTransformer.cs" />
+    <Compile Include="Raven\Transformers\MapToMapModelTransformer.cs" />
+    <Compile Include="Raven\Transformers\SpellToSpellModelTransformer.cs" />
     <Compile Include="Raven\Transformers\SummonerToSummonerModelTransformer.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Windsor\ArrayFacility.cs" />

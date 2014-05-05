@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LeagueStatistics.Shared.Entities;
 
 namespace LeagueStatistics.Shared.Models
 {
     public class SummonerStatisticsModel
     {
+        public GameSubType GameType { get; set; }
         public string SummonerId { get; set; }
         public string SummonerName { get; set; }
 

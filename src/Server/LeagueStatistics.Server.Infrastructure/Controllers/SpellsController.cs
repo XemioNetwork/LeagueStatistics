@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using CuttingEdge.Conditions;
 using LeagueStatistics.Server.Abstractions.Services;
+using LeagueStatistics.Server.Infrastructure.Extensions;
 using LeagueStatistics.Server.Infrastructure.Filters;
+using LeagueStatistics.Server.Infrastructure.Raven.Transformers;
 using LeagueStatistics.Shared.Entities;
+using LeagueStatistics.Shared.Models;
 using Raven.Client;
 
 namespace LeagueStatistics.Server.Infrastructure.Controllers
@@ -36,6 +39,37 @@ namespace LeagueStatistics.Server.Infrastructure.Controllers
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Returns all spells.
+        /// </summary>
+        [Route("Spells")]
+        public IHttpActionResult GetSpells()
+        {
+            var spells = this.DocumentSession.Query<Spell>()
+                .TransformWith<SpellToSpellModelTransformer, SpellModel>()
+                .OrderBy(f => f.Id)
+                .ToList();
+
+            return Ok(spells);
+        }
+        /// <summary>
+        /// Returns the spell with the specified <paramref name="spellId"/>.
+        /// </summary>
+        /// <param name="spellId">The spell identifier.</param>
+        [Route("Spells/{spellId:int}")]
+        public IHttpActionResult GetSpell(int spellId)
+        {
+            Condition.Requires(spellId, "spellId")
+                .IsGreaterThan(0);
+
+            var stringId = this.DocumentSession.Advanced.GetStringIdFor<Spell>(spellId);
+            var spell = this.DocumentSession.Load<SpellToSpellModelTransformer, SpellModel>(stringId);
+
+            if (spell == null)
+                return NotFound();
+
+            return Ok(spell);
+        }
         /// <summary>
         /// Updates all spell data.
         /// </summary>

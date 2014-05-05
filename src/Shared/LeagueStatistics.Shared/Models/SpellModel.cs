@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeagueStatistics.Shared.Entities
+namespace LeagueStatistics.Shared.Models
 {
-    public class Spell : AggregateRoot
+    public class SpellModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public double Cooldown { get; set; }
