@@ -66,55 +66,90 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
             {
                 IEnumerable<IGame> games = await this._leagueApi.Game.GetRecentGamesBySummonerIdAsync(summonerId);
 
-                return games.Select(f => new Match
+                return games.Select(f =>
                 {
-                    Id = string.Format("Summoners/{0}/Matches/{1}", summonerId, f.GameId),
-                    SummonerId = string.Format("Summoners/{0}", summonerId),
-                    CreationDate = f.CreateDate,
-                    FellowPlayers = f.OtherPlayers.Select(d => new FellowPlayer(string.Format("Champions/{0}", d.ChampionId), string.Format("Summoners/{0}", d.SummonerId), this.ConvertTeam(d.TeamId))).ToList(),
-                    Team = this.ConvertTeam(f.TeamId),
-                    GameMode = this.ConvertGameMode(f.GameMode),
-                    GameType = this.ConvertGameType(f.GameType),
-                    GameSubType = this.ConvertGameSubType(f.GameSubType),
-                    MapId = string.Format("Maps/{0}", (int) f.Map),
-                    ChampionId = string.Format("Champions/{0}", f.ChampionId),
-                    FirstSpellId = string.Format("Spells/{0}", f.SummonerSpells.First()),
-                    SecondSpellId = string.Format("Spells/{0}", f.SummonerSpells.Last()),
-                    Win = f.Stats.Win,
-                    IPEarned = f.IpEarned,
-                    Length = TimeSpan.FromSeconds(f.Stats.TimePlayed),
-                    TotalHeal = f.Stats.TotalHeal,
-                    TotalDamageDealt = f.Stats.TotalDamageDealt,
-                    TrueDamageDealt = f.Stats.TrueDamageDealtPlayer,
-                    PhysicalDamageDealt = f.Stats.PhysicalDamageDealtPlayer,
-                    MagicDamageDealt = f.Stats.MagicDamageDealtPlayer,
-                    TotalDamageDealtToChampions = f.Stats.TotalDamageDealtToChampions,
-                    TrueDamageDealtToChampions = f.Stats.TrueDamageDealtToChampions,
-                    PhysicalDamageDealtToChampions = f.Stats.PhysicalDamageDealtToChampions,
-                    MagicDamageDealtToChampions = f.Stats.MagicDamageDealtToChampions,
-                    TotalDamageTaken = f.Stats.TotalDamageTaken,
-                    TrueDamageTaken = f.Stats.TrueDamageTaken,
-                    PhysicalDamageTaken = f.Stats.PhysicalDamageTaken,
-                    MagicDamageTaken = f.Stats.MagicDamageTaken,
-                    Level = f.Stats.Level,
-                    GoldEarned = f.Stats.GoldEarned,
-                    GoldSpent = f.Stats.GoldSpent,
-                    Item1Id = this.ConvertItemId(f.Stats.ItemIds[0]),
-                    Item2Id = this.ConvertItemId(f.Stats.ItemIds[1]),
-                    Item3Id = this.ConvertItemId(f.Stats.ItemIds[2]),
-                    Item4Id = this.ConvertItemId(f.Stats.ItemIds[3]),
-                    Item5Id = this.ConvertItemId(f.Stats.ItemIds[4]),
-                    Item6Id = this.ConvertItemId(f.Stats.ItemIds[5]),
-                    SightWardsBought = f.Stats.SightWardsBought,
-                    WardsKilled = f.Stats.WardKilled,
-                    WardsPlaced = f.Stats.WardPlaced,
-                    ChampionsKilled = f.Stats.ChampionsKilled,
-                    Assists = f.Stats.Assists,
-                    Deaths = f.Stats.NumDeaths,
-                    MinionsKilled = f.Stats.MinionsKilled,
-                    NeutralMinionsKilledYourJungle = f.Stats.NeutralMinionsKilledYourJungle,
-                    NeutralMinionsKilledEnemyJungle = f.Stats.NeutralMinionsKilledEnemyJungle,
-                    LargestMultiKill = f.Stats.LargestMultiKill
+                    var match = new Match
+                    {
+                        Id = string.Format("Matches/{0}", f.GameId),
+                        CreationDate = f.CreateDate,
+                        Length = TimeSpan.FromSeconds(f.Stats.TimePlayed),
+                        GameMode = this.ConvertGameMode(f.GameMode),
+                        GameType = this.ConvertGameType(f.GameType),
+                        GameSubType = this.ConvertGameSubType(f.GameSubType),
+                        MapId = string.Format("Maps/{0}", (int) f.Map),
+                        Teams = new Collection<Team>
+                        {
+                            new Team
+                            {
+                                Color = ConvertTeam(f.TeamId),
+                                Win = f.Stats.Win,
+                                Players = new Collection<PlayerStats>
+                                {
+                                    new PlayerStats
+                                    {
+                                        ChampionId = string.Format("Champions/{0}", f.ChampionId),
+                                        FirstSpellId = string.Format("Spells/{0}", f.SummonerSpells.First()),
+                                        SecondSpellId = string.Format("Spells/{0}", f.SummonerSpells.Last()),
+                                        DataLoaded = true,
+                                        Win = f.Stats.Win,
+                                        InfluencePointsEarned = f.IpEarned,
+                                        TotalHeal = f.Stats.TotalHeal,
+                                        TotalDamageDealt = f.Stats.TotalDamageDealt,
+                                        TrueDamageDealt = f.Stats.TrueDamageDealtPlayer,
+                                        PhysicalDamageDealt = f.Stats.PhysicalDamageDealtPlayer,
+                                        MagicDamageDealt = f.Stats.MagicDamageDealtPlayer,
+                                        TotalDamageDealtToChampions = f.Stats.TotalDamageDealtToChampions,
+                                        TrueDamageDealtToChampions = f.Stats.TrueDamageDealtToChampions,
+                                        PhysicalDamageDealtToChampions = f.Stats.PhysicalDamageDealtToChampions,
+                                        MagicDamageDealtToChampions = f.Stats.MagicDamageDealtToChampions,
+                                        TotalDamageTaken = f.Stats.TotalDamageTaken,
+                                        TrueDamageTaken = f.Stats.TrueDamageTaken,
+                                        PhysicalDamageTaken = f.Stats.PhysicalDamageTaken,
+                                        MagicDamageTaken = f.Stats.MagicDamageTaken,
+                                        Level = f.Stats.Level,
+                                        GoldEarned = f.Stats.GoldEarned,
+                                        GoldSpent = f.Stats.GoldSpent,
+                                        Item1Id = this.ConvertItemId(f.Stats.ItemIds[0]),
+                                        Item2Id = this.ConvertItemId(f.Stats.ItemIds[1]),
+                                        Item3Id = this.ConvertItemId(f.Stats.ItemIds[2]),
+                                        Item4Id = this.ConvertItemId(f.Stats.ItemIds[3]),
+                                        Item5Id = this.ConvertItemId(f.Stats.ItemIds[4]),
+                                        Item6Id = this.ConvertItemId(f.Stats.ItemIds[5]),
+                                        SightWardsBought = f.Stats.SightWardsBought,
+                                        WardsKilled = f.Stats.WardKilled,
+                                        WardsPlaced = f.Stats.WardPlaced,
+                                        ChampionsKilled = f.Stats.ChampionsKilled,
+                                        Assists = f.Stats.Assists,
+                                        Deaths = f.Stats.NumDeaths,
+                                        MinionsKilled = f.Stats.MinionsKilled,
+                                        NeutralMinionsKilledYourJungle = f.Stats.NeutralMinionsKilledYourJungle,
+                                        NeutralMinionsKilledEnemyJungle = f.Stats.NeutralMinionsKilledEnemyJungle,
+                                        LargestMultiKill = f.Stats.LargestMultiKill,
+                                        SummonerId = string.Format("Summoners/{0}", summonerId)
+                                    }
+                                }
+                            },
+                            new Team
+                            {
+                                Color = GetOtherTeam(f.TeamId),
+                                Win = !f.Stats.Win,
+                                Players = new Collection<PlayerStats>()
+                            }
+                        }
+                    };
+
+                    foreach (var player in f.OtherPlayers)
+                    {
+                        Team team = match.Teams.First(d => d.Color == ConvertTeam(player.TeamId));
+                        team.Players.Add(new PlayerStats
+                        {
+                            DataLoaded = false,
+                            SummonerId = string.Format("Summoners/{0}", player.SummonerId),
+                            ChampionId = string.Format("Champions/{0}", player.ChampionId)
+                        });
+                    }
+
+                    return match;
                 });
             }
             catch (Exception exception)
@@ -250,17 +285,25 @@ namespace LeagueStatistics.Server.Infrastructure.Implementations.Services
         /// Converts the teamId to the specified <see cref="Team"/>.
         /// </summary>
         /// <param name="teamId">The team identifier.</param>
-        private Team ConvertTeam(int teamId)
+        private TeamColor ConvertTeam(int teamId)
         {
             switch (teamId)
             {
                 case 100:
-                    return Team.Blue;
+                    return TeamColor.Blue;
                 case 200:
-                    return Team.Purple;
+                    return TeamColor.Purple;
                 default:
                     throw new ArgumentOutOfRangeException("teamId");
             }
+        }
+        /// <summary>
+        /// Convers the teamId to the other <see cref="Team"/>.
+        /// </summary>
+        /// <param name="teamId">The team identifier.</param>
+        private TeamColor GetOtherTeam(int teamId)
+        {
+            return this.ConvertTeam(teamId) == TeamColor.Purple ? TeamColor.Blue : TeamColor.Purple;
         }
         /// <summary>
         /// Converts the game mode.

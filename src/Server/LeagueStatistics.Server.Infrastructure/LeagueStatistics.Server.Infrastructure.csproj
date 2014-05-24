@@ -206,8 +206,7 @@
     <Compile Include="LeagueStatisticsService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Implementations\Services\LeagueService.cs" />
-    <Compile Include="Raven\Indexes\MatchesBySummonerChampionStatisticsIndex.cs" />
-    <Compile Include="Raven\Indexes\MatchesBySummonerStatisticsIndex.cs" />
+    <Compile Include="Raven\Indexes\MatchesBySummonerId.cs" />
     <Compile Include="Raven\Transformers\ChampionToChampionDetailModelTransformer.cs" />
     <Compile Include="Raven\Transformers\ChampionToChampionModelTransformer.cs" />
     <Compile Include="Raven\Transformers\ItemToItemDetailModelTransformer.cs" />

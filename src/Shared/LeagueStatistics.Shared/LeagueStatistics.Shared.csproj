@@ -49,6 +49,8 @@
     <Compile Include="Entities\Item.cs" />
     <Compile Include="Entities\Map.cs" />
     <Compile Include="Entities\Match.cs" />
+    <Compile Include="Entities\NeededSummonerMatch.cs" />
+    <Compile Include="Entities\PlayerStats.cs" />
     <Compile Include="Entities\Spell.cs" />
     <Compile Include="Entities\Summoner.cs" />
     <Compile Include="Entities\AggregateRoot.cs" />

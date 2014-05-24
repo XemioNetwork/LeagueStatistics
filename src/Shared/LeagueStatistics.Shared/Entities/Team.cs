@@ -1,6 +1,6 @@
 namespace LeagueStatistics.Shared.Entities
 {
-    public enum Team
+    public enum TeamColor
     {
         Blue,
         Purple
